@@ -1,19 +1,19 @@
 import { Cpu, HardDrive, RefreshCw } from "lucide-react";
 
 interface DevToolbarProps {
-  setProvider: (p: string) => void;
   model: string;
   setModel: (m: string) => void;
   environment: string;
   setEnvironment: (e: string) => void;
+  discoveredModels?: any[];
 }
 
 export default function DevToolbar({
-  setProvider,
   model,
   setModel,
   environment,
   setEnvironment,
+  discoveredModels,
 }: DevToolbarProps) {
   const handleResetConversation = () => {
     window.location.reload();
@@ -49,21 +49,22 @@ export default function DevToolbar({
           <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Model:</span>
           <select
             value={model}
-            onChange={(e) => {
-              const val = e.target.value;
-              setModel(val);
-              if (val.includes("nemotron")) {
-                setProvider("openrouter");
-              } else {
-                setProvider("google");
-              }
-            }}
+            onChange={(e) => setModel(e.target.value)}
             className="bg-transparent text-xs font-semibold text-indigo-400 focus:outline-none cursor-pointer border-none p-0 pr-1"
           >
-            <option value="gemini-2.5-flash" className="bg-slate-950 text-slate-200">Gemini 2.5 Flash</option>
-            <option value="gemini-2.5-pro" className="bg-slate-950 text-slate-200">Gemini 2.5 Pro</option>
-            <option value="nvidia/nemotron-3-super-120b-a12b" className="bg-slate-950 text-slate-200">Nemotron 3 Super</option>
-            <option value="claude-3-5-sonnet" className="bg-slate-950 text-slate-200">Claude 3.5 Sonnet</option>
+            {discoveredModels && discoveredModels.length > 0 ? (
+              discoveredModels.map((m) => (
+                <option key={m.model_id} value={m.model_id} className="bg-slate-950 text-slate-200">
+                  {m.model_name}
+                </option>
+              ))
+            ) : (
+              <>
+                <option value="gemini-1.5-flash" className="bg-slate-950 text-slate-200">Gemini 1.5 Flash</option>
+                <option value="gemini-1.5-pro" className="bg-slate-950 text-slate-200">Gemini 1.5 Pro</option>
+                <option value="nvidia/nemotron-3-super-120b-a12b" className="bg-slate-950 text-slate-200">Nemotron 3 Super</option>
+              </>
+            )}
           </select>
         </div>
       </div>

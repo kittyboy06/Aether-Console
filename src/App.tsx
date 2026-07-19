@@ -35,11 +35,11 @@ export default function App() {
                 isLoading={chatState.isLoading}
                 error={chatState.error}
                 sendMessage={chatState.sendMessage}
-                setProvider={chatState.setProvider}
                 model={chatState.model}
                 setModel={chatState.setModel}
                 environment={chatState.environment}
                 setEnvironment={chatState.setEnvironment}
+                discoveredModels={chatState.discoveredModels}
               />
             }
           />

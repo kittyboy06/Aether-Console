@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import type { Conversation, Message } from "../types";
-import { sendChatMessage } from "../api/chat";
+import { sendChatMessage, updateModelRoute, fetchDiscoveredModels } from "../api/chat";
 import {
   fetchConversations,
   fetchConversationHistory,
@@ -19,21 +19,17 @@ export function useChat() {
   const isNewConversationRef = useRef(false);
 
   // Router configurations (can be overridden by Developer Toolbar)
-  const [provider, setProvider] = useState<string>(() => localStorage.getItem("aether_dev_provider") || "google");
-  const [model, setModel] = useState<string>(() => localStorage.getItem("aether_dev_model") || "gemini-2.5-flash");
+  const [provider, setProviderState] = useState<string>(() => localStorage.getItem("aether_dev_provider") || "google");
+  const [model, setModelState] = useState<string>(() => localStorage.getItem("aether_dev_model") || "gemini-1.5-flash");
   const [environment, setEnvironment] = useState<string>(() => localStorage.getItem("aether_dev_env") || "Live");
+  const [discoveredModels, setDiscoveredModels] = useState<Array<{
+    provider: string;
+    model_id: string;
+    model_name: string;
+  }>>([]);
 
-  useEffect(() => {
-    localStorage.setItem("aether_dev_provider", provider);
-  }, [provider]);
-
-  useEffect(() => {
-    localStorage.setItem("aether_dev_model", model);
-  }, [model]);
-
-  useEffect(() => {
-    localStorage.setItem("aether_dev_env", environment);
-  }, [environment]);
+  // Use ref to break the dependency cycle with handleSyncSuccess
+  const loadConversationsRef = useRef<(() => Promise<void>) | undefined>(undefined);
 
   // Sync callbacks: when an offline item successfully syncs with the server
   const handleSyncSuccess = useCallback((item: SyncItem, response?: any) => {
@@ -58,8 +54,8 @@ export function useChat() {
         );
       }
       
-      // Refresh conversation list
-      loadConversations();
+      // Refresh conversation list via ref
+      loadConversationsRef.current?.();
     }
   }, []);
 
@@ -84,6 +80,11 @@ export function useChat() {
     }
   }, [isOnline]);
 
+  // Keep the ref updated with the latest loadConversations instance
+  useEffect(() => {
+    loadConversationsRef.current = loadConversations;
+  }, [loadConversations]);
+
   // Load message history for specific conversation
   const loadHistory = useCallback(async (convId: string) => {
     if (!convId) return;
@@ -106,6 +107,115 @@ export function useChat() {
       if (cached) setMessages(JSON.parse(cached));
     } finally {
       setIsLoading(false);
+    }
+  }, [isOnline]);
+
+  const setModel = useCallback(async (newModel: string) => {
+    setModelState(newModel);
+    localStorage.setItem("aether_dev_model", newModel);
+    
+    let resolvedProvider = provider;
+    if (newModel.toLowerCase().includes("nemotron")) {
+      resolvedProvider = "openrouter";
+      setProviderState("openrouter");
+      localStorage.setItem("aether_dev_provider", "openrouter");
+    } else {
+      resolvedProvider = "google";
+      setProviderState("google");
+      localStorage.setItem("aether_dev_provider", "google");
+    }
+
+    try {
+      const stages = ["chat", "reasoner", "planner", "reflector", "identity"];
+      await Promise.all(
+        stages.map((stage) => updateModelRoute(stage, resolvedProvider, newModel))
+      );
+    } catch (err) {
+      console.warn("Failed to propagate model route update to backend:", err);
+    }
+  }, [provider, isOnline]);
+
+  const setProvider = useCallback(async (newProvider: string) => {
+    setProviderState(newProvider);
+    localStorage.setItem("aether_dev_provider", newProvider);
+
+    try {
+      const stages = ["chat", "reasoner", "planner", "reflector", "identity"];
+      await Promise.all(
+        stages.map((stage) => updateModelRoute(stage, newProvider, model))
+      );
+    } catch (err) {
+      console.warn("Failed to propagate provider route update to backend:", err);
+    }
+  }, [model, isOnline]);
+
+  useEffect(() => {
+    localStorage.setItem("aether_dev_env", environment);
+  }, [environment]);
+
+  // Load discovered models on mount and network updates
+  useEffect(() => {
+    async function loadModels() {
+      try {
+        const data = await fetchDiscoveredModels();
+        const filtered = data
+          .map((m) => {
+            // Map the unusable/non-existent 2.5 names to actual 1.5 working models
+            if (m.model_id === "gemini-2.5-flash") {
+              return { ...m, model_id: "gemini-1.5-flash", model_name: "Gemini 1.5 Flash" };
+            }
+            if (m.model_id === "gemini-2.5-pro") {
+              return { ...m, model_id: "gemini-1.5-pro", model_name: "Gemini 1.5 Pro" };
+            }
+            return m;
+          })
+          .filter((m) => {
+            const modelId = m.model_id.toLowerCase();
+            const mProvider = m.provider.toLowerCase();
+            
+            // Remove completely unusable models (e.g. invalid name 2.5 or Claude which is not registered/active in reasoning engine)
+            if (modelId.includes("gemini-2.5")) return false;
+            if (modelId.includes("claude")) return false;
+
+            const isGoogle = mProvider === "google" && (modelId.startsWith("gemini-1.5") || modelId.startsWith("gemini-2.0") || modelId.includes("gemini-embedding"));
+            const isNvidia = (mProvider === "nvidia" || mProvider === "openrouter") && modelId.includes("nemotron");
+
+            return isGoogle || isNvidia;
+          });
+
+        // Deduplicate
+        const unique: typeof filtered = [];
+        const seenIds = new Set<string>();
+        filtered.forEach((m) => {
+          if (!seenIds.has(m.model_id)) {
+            seenIds.add(m.model_id);
+            unique.push(m);
+          }
+        });
+
+        if (unique.length > 0) {
+          setDiscoveredModels(unique);
+        } else {
+          throw new Error("No front tier models in discovery response.");
+        }
+      } catch (err) {
+        console.warn("Discovered models sync failure. Falling back to default list.", err);
+        setDiscoveredModels([
+          { provider: "google", model_id: "gemini-1.5-flash", model_name: "Gemini 1.5 Flash" },
+          { provider: "google", model_id: "gemini-1.5-pro", model_name: "Gemini 1.5 Pro" },
+          { provider: "openrouter", model_id: "nvidia/nemotron-3-super-120b-a12b", model_name: "Nemotron 3 Super" },
+        ]);
+      }
+    }
+
+    if (isOnline) {
+      loadModels();
+    } else {
+      setDiscoveredModels([
+        { provider: "google", model_id: "gemini-1.5-flash", model_name: "Gemini 1.5 Flash" },
+        { provider: "google", model_id: "gemini-1.5-pro", model_name: "Gemini 1.5 Pro" },
+        { provider: "openrouter", model_id: "nvidia/nemotron-3-super-120b-a12b", model_name: "Nemotron 3 Super" },
+      ]);
     }
   }, [isOnline]);
 
@@ -289,5 +399,6 @@ export function useChat() {
     createNewChat,
     renameChat,
     deleteChat,
+    discoveredModels,
   };
 }

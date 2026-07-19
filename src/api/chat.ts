@@ -32,3 +32,34 @@ export async function sendChatMessage(
 
   return response.json();
 }
+
+export async function updateModelRoute(
+  routeKey: string,
+  provider: string,
+  model: string,
+  policy?: string
+): Promise<{ success: boolean }> {
+  const response = await fetch(`${API_BASE}/api/v1/routing/update`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ routeKey, provider, model, policy }),
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to update routing: ${response.statusText}`);
+  }
+  return response.json();
+}
+
+export async function fetchDiscoveredModels(): Promise<Array<{
+  provider: string;
+  model_id: string;
+  model_name: string;
+}>> {
+  const response = await fetch(`${API_BASE}/api/v1/models/discovery`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch discovered models: ${response.statusText}`);
+  }
+  return response.json();
+}
