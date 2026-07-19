@@ -48,7 +48,7 @@ export default function ChatWindow({ messages, isLoading, error }: ChatWindowPro
   }, [messages, isLoading]);
 
   return (
-    <div className="w-full h-full flex flex-col overflow-y-auto px-6 py-6 space-y-6">
+    <div className="w-full h-full flex flex-col overflow-y-auto px-4 py-4 md:px-6 md:py-6 space-y-4 md:space-y-6">
       {messages.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center text-center space-y-3 select-none">
           <div className="w-12 h-12 rounded-2xl bg-teal-500/10 border border-teal-500/25 flex items-center justify-center text-teal-400">

@@ -27,7 +27,7 @@ export default function Settings() {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden bg-slate-900/40 p-6">
+    <div className="flex-1 flex flex-col h-full overflow-y-auto bg-slate-900/40 p-4 sm:p-6">
       {/* Page Header */}
       <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/5">
         <div>
@@ -54,7 +54,7 @@ export default function Settings() {
           <h3 className="text-sm font-semibold text-white">API URL Override</h3>
           <div className="space-y-1.5">
             <label className="text-[11px] text-slate-400 font-medium">Aether Endpoint</label>
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
               <input
                 type="text"
                 value={apiUrl}
@@ -64,7 +64,7 @@ export default function Settings() {
               />
               <button
                 onClick={handleSave}
-                className="px-4 py-2 bg-teal-500 hover:bg-teal-600 active:scale-[0.98] transition-all rounded-lg text-xs font-semibold text-slate-950"
+                className="px-4 py-2 bg-teal-500 hover:bg-teal-600 active:scale-[0.98] transition-all rounded-lg text-xs font-semibold text-slate-950 w-full sm:w-auto"
               >
                 Save Url
               </button>

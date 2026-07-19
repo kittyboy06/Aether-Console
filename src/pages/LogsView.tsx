@@ -50,9 +50,9 @@ export default function LogsView() {
   });
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden bg-slate-900/40 p-6">
+    <div className="flex-1 flex flex-col min-h-0 overflow-y-auto lg:overflow-hidden bg-slate-900/40 p-4 sm:p-6">
       {/* Page Header */}
-      <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-white/5">
         <div>
           <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
             <Terminal className="w-5 h-5 text-indigo-400" />
@@ -90,7 +90,7 @@ export default function LogsView() {
       )}
 
       {/* Terminal View */}
-      <div className="flex-1 flex flex-col min-h-0 bg-slate-950 border border-white/10 rounded-2xl overflow-hidden font-mono text-xs">
+      <div className="flex-1 flex flex-col h-[500px] lg:h-auto min-h-0 bg-slate-950 border border-white/10 rounded-2xl overflow-hidden font-mono text-xs">
         {/* Terminal Header */}
         <div className="flex items-center justify-between px-4 py-2 border-b border-white/5 bg-slate-900/60 select-none">
           <div className="flex gap-1.5">
@@ -98,7 +98,7 @@ export default function LogsView() {
             <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/60"></div>
             <div className="w-2.5 h-2.5 rounded-full bg-green-500/60"></div>
           </div>
-          <div className="flex gap-4">
+          <div className="flex flex-wrap gap-3 sm:gap-4">
             <button
               onClick={() => setFilter("ALL")}
               className={`text-[10px] uppercase font-bold tracking-wider ${

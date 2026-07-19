@@ -175,7 +175,7 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
           {isOpen && (
             <div className="px-4 py-3.5 border-t border-white/5 space-y-4 text-slate-400 bg-slate-950/20 animate-fade-in">
               {/* Row 1: Core parameters */}
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                 <div className="flex items-center gap-2">
                   <Cpu className="w-3.5 h-3.5 text-indigo-400" />
                   <div>
@@ -204,10 +204,10 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
               <hr className="border-white/5" />
 
               {/* Row 2: Graph, Memories, and Tools */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <div className="text-[9px] uppercase tracking-wider font-bold text-slate-500">Ontology References</div>
-                  <div className="grid grid-cols-2 gap-2 text-[10px]">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[10px]">
                     <div className="bg-white/2 p-2 rounded-lg border border-white/3 flex items-center justify-between">
                       <span>Retrieved Memories</span>
                       <span className="text-white font-semibold font-mono">{message.reasoning.retrievedMemories}</span>
@@ -221,7 +221,7 @@ export default function MessageBubble({ message }: MessageBubbleProps) {
 
                 <div className="space-y-2">
                   <div className="text-[9px] uppercase tracking-wider font-bold text-slate-500">Tokens & Telemetry Cost</div>
-                  <div className="grid grid-cols-2 gap-2 text-[10px]">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[10px]">
                     <div className="bg-white/2 p-2 rounded-lg border border-white/3 flex items-center justify-between">
                       <span>Usage Tokens</span>
                       <span className="text-white font-semibold font-mono">

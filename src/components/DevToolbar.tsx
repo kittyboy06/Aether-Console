@@ -25,9 +25,9 @@ export default function DevToolbar({
   };
 
   return (
-    <div className="h-14 border-b border-white/5 bg-slate-900/40 backdrop-blur-md flex items-center justify-between px-6 select-none z-10">
+    <div className="h-auto min-h-14 py-2.5 sm:py-0 border-b border-white/5 bg-slate-900/40 backdrop-blur-md flex flex-col sm:flex-row sm:items-center justify-between px-4 sm:px-6 gap-3 select-none z-10 flex-shrink-0">
       {/* Configuration selectors */}
-      <div className="flex items-center gap-6">
+      <div className="flex flex-wrap items-center gap-4 sm:gap-6">
         {/* Environment */}
         <div className="flex items-center gap-2">
           <HardDrive className="w-3.5 h-3.5 text-slate-400" />
@@ -44,7 +44,7 @@ export default function DevToolbar({
         </div>
 
         {/* Provider */}
-        <div className="flex items-center gap-2 border-l border-white/5 pl-6">
+        <div className="flex items-center gap-2 sm:border-l border-white/5 sm:pl-6">
           <Cpu className="w-3.5 h-3.5 text-slate-400" />
           <span className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Model:</span>
           <select
@@ -69,13 +69,13 @@ export default function DevToolbar({
       </div>
 
       {/* Action Buttons */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-3 border-t sm:border-t-0 border-white/5 pt-2.5 sm:pt-0">
         <button
           onClick={handleClearCache}
           title="Flushes LocalStorage session caches"
           className="text-xs font-medium text-slate-400 hover:text-white px-2.5 py-1 rounded border border-white/5 hover:border-white/10 transition-colors"
         >
-          Clear Memory Cache
+          Clear Cache
         </button>
 
         <button

@@ -37,9 +37,9 @@ export default function GraphView() {
     : [];
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden bg-slate-900/40 p-6">
+    <div className="flex-1 flex flex-col min-h-0 overflow-y-auto lg:overflow-hidden bg-slate-900/40 p-4 sm:p-6">
       {/* Page Header */}
-      <div className="flex items-center justify-between mb-6 pb-4 border-b border-white/5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-white/5">
         <div>
           <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
             <GitMerge className="w-5 h-5 text-teal-400" />
@@ -76,7 +76,7 @@ export default function GraphView() {
         <div className="flex-1 flex flex-col min-h-0 gap-6">
           {/* Tiers Summary Stats */}
           {snapshot && (
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               <div className="p-4 rounded-xl glass-panel flex items-center gap-4">
                 <div className="p-2.5 rounded-lg bg-teal-500/10 text-teal-400">
                   <Database className="w-5 h-5" />
@@ -136,9 +136,9 @@ export default function GraphView() {
           )}
 
           {/* Node and Edge Grid */}
-          <div className="flex-1 grid grid-cols-3 min-h-0 gap-6">
+          <div className="flex-1 flex flex-col lg:grid lg:grid-cols-3 min-h-0 gap-4 lg:gap-6">
             {/* Nodes Explorer */}
-            <div className="col-span-2 flex flex-col min-h-0 glass-panel rounded-2xl p-4">
+            <div className="lg:col-span-2 flex flex-col h-[400px] lg:h-auto min-h-0 glass-panel rounded-2xl p-4">
               <div className="flex items-center justify-between mb-4 pb-2 border-b border-white/5">
                 <h3 className="text-sm font-semibold text-white">Entities & Concepts ({filteredNodes.length})</h3>
                 <select
@@ -185,7 +185,7 @@ export default function GraphView() {
             </div>
 
             {/* Edges Explorer */}
-            <div className="flex flex-col min-h-0 glass-panel rounded-2xl p-4">
+            <div className="flex flex-col h-[300px] lg:h-auto min-h-0 glass-panel rounded-2xl p-4">
               <h3 className="text-sm font-semibold text-white mb-4 pb-2 border-b border-white/5">
                 Semantic Edges ({snapshot?.edges.length || 0})
               </h3>
