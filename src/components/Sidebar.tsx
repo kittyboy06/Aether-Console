@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import type { Conversation } from "../types";
 import HealthIndicator from "./HealthIndicator";
 import {
@@ -39,6 +39,7 @@ export default function Sidebar({
   environment,
 }: SidebarProps) {
   const location = useLocation();
+  const navigate = useNavigate();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState("");
 
@@ -109,7 +110,7 @@ export default function Sidebar({
             setCurrentId(c.id);
             // Navigate to root chat page
             if (location.pathname !== "/") {
-              window.location.href = "/";
+              navigate("/");
             }
           }
         }}

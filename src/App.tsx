@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import { useChat } from "./hooks/useChat";
 import MainLayout from "./layouts/MainLayout";
 import Chat from "./pages/Chat";
@@ -10,7 +10,7 @@ export default function App() {
   const chatState = useChat();
 
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route
           element={
@@ -48,6 +48,6 @@ export default function App() {
           <Route path="/settings" element={<Settings />} />
         </Route>
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
